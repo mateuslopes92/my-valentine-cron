@@ -63,6 +63,11 @@ cron.schedule("0 17 * * *", () => {
   sendNotification("Amor… e o patinete? 🛴🔌", "Magina poder tirar a sonequinha de meio dia e nao ter bateria ? 🫠");
 });
 
+// Task de test – todos os dias às 18
+cron.schedule("0 18 * * *", () => {
+  console.log("Rodando tarefa de teste às 18:00");
+});
+
 
 // Inicia o servidor web (Render exige isso)
 app.listen(PORT, () => {
