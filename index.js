@@ -63,10 +63,6 @@ cron.schedule("0 17 * * *", () => {
   sendNotification("Amor… e o patinete? 🛴🔌", "Magina poder tirar a sonequinha de meio dia e nao ter bateria ? 🫠");
 });
 
-// Teste temporário – às 14:20
-cron.schedule("* * * * *", () => {
-  sendNotification("Teste agora", "Funcionou! São 14:20 e sua notificação foi enviada 🚀");
-});
 
 // Inicia o servidor web (Render exige isso)
 app.listen(PORT, () => {
