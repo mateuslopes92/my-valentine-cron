@@ -2,6 +2,7 @@ const express = require("express");
 const cron = require("node-cron");
 const { exec } = require("child_process");
 require("dotenv").config();
+const axios = require("axios");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,20 +13,31 @@ app.get("/", (req, res) => {
 });
 
 // Notificação via CLI
-const sendNotification = (title, message) => {
-  const command = `onesignal notification create --app-id ${process.env.APP_ID} --rest-api-key ${process.env.REST_API_KEY} \
---included-segments "Subscribed Users" \
---headings '{ "en": "${title}" }' \
---contents '{ "en": "${message}" }'`;
+const sendNotification = async (title, message) => {
+  const options = {
+  method: 'POST',
+  url: 'https://api.onesignal.com/notifications?c=push',
+  headers: {
+    accept: 'application/json',
+    Authorization: `Key ${process.env.REST_API_KEY}`,
+    'content-type': 'application/json'
+  },
+  data: {
+    app_id: process.env.APP_ID,
+    headings: {en: title},
+    contents: {en: message},
+    included_segments: ['Active Subscriptions']
+  }
+}
+  try {
+    const response = await axios.request(options);
 
-  exec(command, (err, stdout, stderr) => {
-    if (err) {
-      console.error("Erro:", err.message);
-    } else {
-      console.log(`Notificação enviada: ${title}`);
-    }
-  });
+    console.log("Notificação enviada:", response);
+  } catch (error) {
+    console.error("Erro ao enviar notificação:", error.response?.data || error.message);
+  }
 };
+
 // Bom dia – todos os dias às 08:00
 cron.schedule("0 8 * * *", () => {
   sendNotification("Bom dia gatinha ❤️☀", "O mundo merece sua luz, que voce brilhe mais um dia! Te amo minha novinha ❤️");
@@ -49,6 +61,11 @@ cron.schedule("15 0 * * *", () => {
 // Carregar patinete – todos os dias às 17
 cron.schedule("0 17 * * *", () => {
   sendNotification("Amor… e o patinete? 🛴🔌", "Magina poder tirar a sonequinha de meio dia e nao ter bateria ? 🫠");
+});
+
+// Teste temporário – às 14:20
+cron.schedule("* * * * *", () => {
+  sendNotification("Teste agora", "Funcionou! São 14:20 e sua notificação foi enviada 🚀");
 });
 
 // Inicia o servidor web (Render exige isso)
